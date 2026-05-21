@@ -1,12 +1,12 @@
 module pill_bottling (
     input clk_1hz,
     input rst,
-    input sta_k0,   // å¯åŠ¨
-    input pau_k1,   // æš‚åœ
-    input set_k2,   // è®¾ç½® / åˆ‡æ¢è®¾ç½®é¡¹
+    input sta_k0,   // Æô¶¯
+    input pau_k1,   // ÔİÍ£
+    input set_k2,   // ÉèÖÃ / ÇĞ»»ÉèÖÃÏî
     input inc_k3,   // -1
     input dec_k4,   // +1
-    input vie_k5,   // æŸ¥çœ‹è®¾å®šå€¼
+    input vie_k5,   // ²é¿´Éè¶¨Öµ
     output reg [3:0] pill_ten,
     output reg [3:0] pill_one,
     output reg [3:0] bottle_ten,
@@ -15,16 +15,16 @@ module pill_bottling (
     output reg [6:0] alarm
 );
 
-// å½“å‰å€¼å¯„å­˜å™¨
+// µ±Ç°Öµ¼Ä´æÆ÷
 reg [6:0] cur_pills;
 reg [6:0] cur_bottles;
 
-// è®¾å®šå€¼å¯„å­˜å™¨
+// Éè¶¨Öµ¼Ä´æÆ÷
 reg [6:0] set_pills;
 reg [6:0] set_bottles;
 
 // ====================================================
-// ç³»ç»ŸçŠ¶æ€æœºå®šä¹‰
+// ÏµÍ³×´Ì¬»ú¶¨Òå
 // ====================================================
 reg [2:0] sys_state;
 localparam IDLE  = 3'd0;
@@ -33,11 +33,11 @@ localparam PAUSE = 3'd2;
 localparam SET   = 3'd3;
 localparam DONE  = 3'd4;
 
-// è®¾ç½®å­çŠ¶æ€ï¼š0-è®¾ç½®æ¯ç“¶ç‰‡æ•°ï¼Œ1-è®¾ç½®ç›®æ ‡ç“¶æ•°
+// ÉèÖÃ×Ó×´Ì¬£º0-ÉèÖÃÃ¿Æ¿Æ¬Êı£¬1-ÉèÖÃÄ¿±êÆ¿Êı
 reg set_mode; 
 
 // ====================================================
-// æŒ‰é”®è¾¹ç¼˜æ£€æµ‹ (é’ˆå¯¹ 1Hz æ…¢æ—¶é’Ÿçš„åŒæ­¥è¾¹ç¼˜è§¦å‘å¯„å­˜å™¨)
+// °´¼ü±ßÔµ¼ì²â (Õë¶Ô 1Hz ÂıÊ±ÖÓµÄÍ¬²½±ßÔµ´¥·¢¼Ä´æÆ÷)
 // ====================================================
 reg r_sta_k0, r_pau_k1, r_set_k2, r_inc_k3, r_dec_k4;
 always @(posedge clk_1hz or negedge rst) begin
@@ -56,7 +56,7 @@ always @(posedge clk_1hz or negedge rst) begin
     end
 end
 
-// ä¸‹é™æ²¿æœ‰æ•ˆ (æ•æ‰æŒ‰é”®æŒ‰ä¸‹ç¬é—´)
+// ÏÂ½µÑØÓĞĞ§ (²¶×½°´¼ü°´ÏÂË²¼ä)
 wire sta_edge = (r_sta_k0 && !sta_k0);
 wire pau_edge = (r_pau_k1 && !pau_k1);
 wire set_edge = (r_set_k2 && !set_k2);
@@ -64,19 +64,19 @@ wire inc_edge = (r_inc_k3 && !inc_k3);
 wire dec_edge = (r_dec_k4 && !dec_k4);
 
 // ====================================================
-// ä¸»çŠ¶æ€æœºä¸æ ¸å¿ƒè®¡æ•°é€»è¾‘
+// Ö÷×´Ì¬»úÓëºËĞÄ¼ÆÊıÂß¼­
 // ====================================================
 always @(posedge clk_1hz or negedge rst) begin
     if(!rst) begin
         cur_pills   <= 7'd0;
         cur_bottles <= 7'd0;
-        set_pills   <= 7'd10; // é»˜è®¤æ¯ç“¶10ç‰‡
-        set_bottles <= 7'd5;  // é»˜è®¤ç›®æ ‡5ç“¶
+        set_pills   <= 7'd10; // Ä¬ÈÏÃ¿Æ¿10Æ¬
+        set_bottles <= 7'd5;  // Ä¬ÈÏÄ¿±ê5Æ¿
         sys_state   <= IDLE;
         set_mode    <= 1'b0;
     end else begin
         
-        // 1. çŠ¶æ€è·³è½¬ä¸å‚æ•°è°ƒæ•´åˆ†æ”¯
+        // 1. ×´Ì¬Ìø×ªÓë²ÎÊıµ÷Õû·ÖÖ§
         case(sys_state)
             IDLE: begin
                 cur_pills   <= 7'd0;
@@ -84,7 +84,7 @@ always @(posedge clk_1hz or negedge rst) begin
                 if(sta_edge)       sys_state <= WORK;
                 else if(set_edge) begin
                     sys_state <= SET;
-                    set_mode  <= 1'b0; // é»˜è®¤å…ˆè¿›å…¥"è®¾ç½®å•ç“¶ç‰‡æ•°"
+                    set_mode  <= 1'b0; // Ä¬ÈÏÏÈ½øÈë"ÉèÖÃµ¥Æ¿Æ¬Êı"
                 end
             end
             
@@ -105,33 +105,33 @@ always @(posedge clk_1hz or negedge rst) begin
             end
             
             SET: begin
-                // æŒ‰ä¸‹ SET é”®é¡ºåºåˆ‡æ¢
+                // °´ÏÂ SET ¼üË³ĞòÇĞ»»
                 if(set_edge) begin
                     if(set_mode == 1'b0) begin
-                        set_mode <= 1'b1; // åˆ‡æ¢åˆ°"è®¾ç½®æ€»ç“¶æ•°"
+                        set_mode <= 1'b1; // ÇĞ»»µ½"ÉèÖÃ×ÜÆ¿Êı"
                     end else begin
-                        sys_state <= IDLE; // è®¾ç½®å®Œæ¯•ï¼Œå›åˆ°ç©ºé—²çŠ¶æ€
+                        sys_state <= IDLE; // ÉèÖÃÍê±Ï£¬»Øµ½¿ÕÏĞ×´Ì¬
                     end
                 end
                 
-                // å‚æ•°åŠ å‡è°ƒèŠ‚æ§åˆ¶
-                if(set_mode == 1'b0) begin // è°ƒæ•´å•ç“¶è¯ç‰‡æ•°ç›®æ ‡é™åˆ¶ (1 ~ 99)
+                // ²ÎÊı¼Ó¼õµ÷½Ú¿ØÖÆ
+                if(set_mode == 1'b0) begin // µ÷Õûµ¥Æ¿Ò©Æ¬ÊıÄ¿±êÏŞÖÆ (1 ~ 99)
                     if(inc_edge && set_pills < 7'd99) set_pills <= set_pills + 7'd1;
                     if(dec_edge && set_pills > 7'd1)  set_pills <= set_pills - 7'd1;
-                end else begin             // è°ƒæ•´ç›®æ ‡æ€»ç“¶æ•°é™åˆ¶ (1 ~ 99)
+                end else begin             // µ÷ÕûÄ¿±ê×ÜÆ¿ÊıÏŞÖÆ (1 ~ 99)
                     if(inc_edge && set_bottles < 7'd99) set_bottles <= set_bottles + 7'd1;
                     if(dec_edge && set_bottles > 7'd1)  set_bottles <= set_bottles - 7'd1;
                 end
             end
             
             DONE: begin
-                // å®ŒæˆçŠ¶æ€ï¼Œä¸ä½œè·³å‡ºå¤„ç†ã€‚ç›´åˆ°ç¡¬ä»¶å¤–éƒ¨äº§ç”Ÿ rst ä¿¡å·æ¢å¤åˆ° IDLE
+                // Íê³É×´Ì¬£¬²»×÷Ìø³ö´¦Àí¡£Ö±µ½Ó²¼şÍâ²¿²úÉú rst ĞÅºÅ»Ö¸´µ½ IDLE
             end
             
             default: sys_state <= IDLE;
         endcase
         
-        // 2. è‡ªåŠ¨è¯ç‰‡æµæ°´çº¿è®¡æ•°é€»è¾‘ (ä»…å·¥ä½œçŠ¶æ€ä¸”ç“¶æ•°æœªæ»¡)
+        // 2. ×Ô¶¯Ò©Æ¬Á÷Ë®Ïß¼ÆÊıÂß¼­ (½ö¹¤×÷×´Ì¬ÇÒÆ¿ÊıÎ´Âú)
         if(sys_state == WORK && cur_bottles < set_bottles) begin
             if(cur_pills + 7'd1 >= set_pills) begin
                 cur_pills   <= 7'd0;
@@ -145,33 +145,33 @@ always @(posedge clk_1hz or negedge rst) begin
 end
 
 // ====================================================
-// æ˜¾ç¤ºè¾“å‡ºæ§åˆ¶é€»è¾‘ (å¤šè·¯ç»„åˆå¤ç”¨å™¨)
+// ÏÔÊ¾Êä³ö¿ØÖÆÂß¼­ (¶àÂ·×éºÏ¸´ÓÃÆ÷)
 // ====================================================
 
-// ä¿®å¤è¯­æ³•é”™è¯¯ï¼šresult å¯„å­˜å™¨å¿…é¡»å®šä¹‰åœ¨ always å—å¤–éƒ¨
+// ĞŞ¸´Óï·¨´íÎó£ºresult ¼Ä´æÆ÷±ØĞë¶¨ÒåÔÚ always ¿éÍâ²¿
 reg [7:0] result_pills;
 reg [7:0] result_bottles;
 
 always @(*) begin
-    // é»˜è®¤é˜²é”å­˜å™¨æ¸…é™¤èµ‹å€¼
+    // Ä¬ÈÏ·ÀËø´æÆ÷Çå³ı¸³Öµ
     result_pills   = 8'd0;
     result_bottles = 8'd0;
 
     if(sys_state == SET) begin
-        // è®¾ç½®çŠ¶æ€ä¸‹ï¼šæ•°ç ç®¡ç›´æ¥å®æ—¶æ˜¾ç¤ºæ­£åœ¨ä¿®æ”¹çš„é…ç½®ç›®æ ‡å€¼
+        // ÉèÖÃ×´Ì¬ÏÂ£ºÊıÂë¹ÜÖ±½ÓÊµÊ±ÏÔÊ¾ÕıÔÚĞŞ¸ÄµÄÅäÖÃÄ¿±êÖµ
         result_pills   = split_bcd(set_pills);
         result_bottles = split_bcd(set_bottles);
     end else if(vie_k5 == 1'b0) begin
-        // ä»»ä½•éè®¾ç½®çŠ¶æ€ä¸‹æŒ‰ä¸‹ã€æŸ¥çœ‹é”®ã€‘ï¼šåˆ‡ä¸ºæ˜¾ç¤ºè®¾å®šç›®æ ‡å€¼
+        // ÈÎºÎ·ÇÉèÖÃ×´Ì¬ÏÂ°´ÏÂ¡¾²é¿´¼ü¡¿£ºÇĞÎªÏÔÊ¾Éè¶¨Ä¿±êÖµ
         result_pills   = split_bcd(set_pills);
         result_bottles = split_bcd(set_bottles);
     end else begin
-        // é»˜è®¤è¿è¡ŒçŠ¶æ€ä¸‹ï¼šæŒç»­è¾“å‡ºå½“å‰çš„å®æ—¶è¿è¡Œè®¡æ•°å€¼
+        // Ä¬ÈÏÔËĞĞ×´Ì¬ÏÂ£º³ÖĞøÊä³öµ±Ç°µÄÊµÊ±ÔËĞĞ¼ÆÊıÖµ
         result_pills   = split_bcd(cur_pills);
         result_bottles = split_bcd(cur_bottles);
     end
     
-    // æ€»çº¿åˆ†æ‹†åˆ°åä½ä¸ä¸ªä½è¾“å‡ºä¿¡å·
+    // ×ÜÏß·Ö²ğµ½Ê®Î»Óë¸öÎ»Êä³öĞÅºÅ
     pill_ten    = result_pills[7:4];
     pill_one    = result_pills[3:0];
     bottle_ten  = result_bottles[7:4];
@@ -179,39 +179,39 @@ always @(*) begin
 end
 
 // ====================================================
-// 7æ®µå…±é˜´ææ•°ç ç®¡è¯‘ç ä¸è­¦æŠ¥çŠ¶æ€æŒ‡ç¤º
+// 7¶Î¹²Òõ¼«ÊıÂë¹ÜÒëÂëÓë¾¯±¨×´Ì¬Ö¸Ê¾
 // ====================================================
 
-// å•ç‹¬çŠ¶æ€æ•°ç ç®¡æ˜¾ç¤ºå¤„ç†
+// µ¥¶À×´Ì¬ÊıÂë¹ÜÏÔÊ¾´¦Àí
 always @(*) begin
     case(sys_state)
-        IDLE:    state = 4'd0; // ç©ºé—²çŠ¶æ€ï¼šæ˜¾ç¤ºå­—å½¢ 0
-        WORK:    state = 4'd1; // è¿è¡ŒçŠ¶æ€ï¼šæ˜¾ç¤ºå­—å½¢ 1
-        PAUSE:   state = 4'd2; // æš‚åœçŠ¶æ€ï¼šæ˜¾ç¤ºå­—å½¢ 2
-        SET:     state = (set_mode == 1'b0) ? 4'd3 : 4'd5; // è°ƒç‰‡æ•°æ˜¾3ï¼Œè°ƒç“¶æ•°æ˜¾5
-        DONE:    state = 4'd4; // å®ŒæˆçŠ¶æ€ï¼šæ˜¾ç¤ºå­—å½¢ 4
+        IDLE:    state = 4'd0; // ¿ÕÏĞ×´Ì¬£ºÏÔÊ¾×ÖĞÎ 0
+        WORK:    state = 4'd1; // ÔËĞĞ×´Ì¬£ºÏÔÊ¾×ÖĞÎ 1
+        PAUSE:   state = 4'd2; // ÔİÍ£×´Ì¬£ºÏÔÊ¾×ÖĞÎ 2
+        SET:     state = (set_mode == 1'b0) ? 4'd3 : 4'd5; // µ÷Æ¬ÊıÏÔ3£¬µ÷Æ¿ÊıÏÔ5
+        DONE:    state = 4'd4; // Íê³É×´Ì¬£ºÏÔÊ¾×ÖĞÎ 4
         default: state = 4'd0;
     endcase
 end
 
-// æ¨¡å¼/å‘Šè­¦è¾“å‡ºæ€»çº¿æ§åˆ¶ (ç”¨äºæŒ‡ç¤ºå½“å‰æ˜¯å¦å±äºæŸ¥çœ‹æ¨¡å¼/è®¾ç½®æ¨¡å¼)
+// Ä£Ê½/¸æ¾¯Êä³ö×ÜÏß¿ØÖÆ (ÓÃÓÚÖ¸Ê¾µ±Ç°ÊÇ·ñÊôÓÚ²é¿´Ä£Ê½/ÉèÖÃÄ£Ê½)
 always @(*) begin
     if(sys_state == SET) begin
-        alarm = 7'b1010101; // è®¾ç½®æ¨¡å¼ï¼šLEDäº¤æ›¿å‘å…‰
+        alarm = 7'b1010101; // ÉèÖÃÄ£Ê½£ºLED½»Ìæ·¢¹â
     end else if(vie_k5 == 1'b0) begin
-        alarm = 7'b1111111; // è¿è¡Œä¸­çœ‹ç›®æ ‡å€¼ï¼šLEDå…¨äº®æç¤º
+        alarm = 7'b1111111; // ÔËĞĞÖĞ¿´Ä¿±êÖµ£ºLEDÈ«ÁÁÌáÊ¾
     end else if(sys_state == DONE) begin
-        alarm = 7'b1111111; // æ»¡è½½å®Œæˆï¼šLEDå…¨äº®æç¤º
+        alarm = 7'b1111111; // ÂúÔØÍê³É£ºLEDÈ«ÁÁÌáÊ¾
     end else begin
-        alarm = 7'b0000000; // æ­£å¸¸å·¥ä½œè¿è¡Œå®æ—¶å€¼ï¼šLEDå…¨ç­
+        alarm = 7'b0000000; // Õı³£¹¤×÷ÔËĞĞÊµÊ±Öµ£ºLEDÈ«Ãğ
     end
 end
 
 // ====================================================
-// å·¥å…·è¾…åŠ©å‡½æ•° (Functions)
+// ¹¤¾ß¸¨Öúº¯Êı (Functions)
 // ====================================================
 
-// 0-99 çº¯ç»„åˆé€»è¾‘é«˜é€Ÿå‡æ³•å®ç° BCD æ‹†åˆ†ï¼ˆè§„é¿ç¡¬ä»¶é™¤æ³•å™¨ï¼Œ100%å¯ç»¼åˆï¼‰
+// 0-99 ´¿×éºÏÂß¼­¸ßËÙ¼õ·¨ÊµÏÖ BCD ²ğ·Ö£¨¹æ±ÜÓ²¼ş³ı·¨Æ÷£¬100%¿É×ÛºÏ£©
 function [7:0] split_bcd;
     input [6:0] num;
     reg [3:0] ten;
@@ -242,7 +242,7 @@ function [7:0] split_bcd;
     end
 endfunction
 
-// 7æ®µæ•°ç ç®¡ç»å…¸çœŸå€¼è¡¨ (å…±é˜´ææ ¼å¼ï¼Œ1ç‚¹äº®ï¼Œ0ç†„ç­)
+// 7¶ÎÊıÂë¹Ü¾­µäÕæÖµ±í (¹²Òõ¼«¸ñÊ½£¬1µãÁÁ£¬0Ï¨Ãğ)
 function [6:0] seg7;
     input [3:0] num;
     begin
