@@ -4,8 +4,8 @@ module pill_bottling (
     input sta_k0,   // 启动
     input pau_k1,   // 暂停
     input set_k2,   // 设置 / 切换设置项
-    input inc_k3,   // -1
-    input dec_k4,   // +1
+    input inc_k3,   // +1
+    input dec_k4,   // -1
     input vie_k5,   // 查看设定值
     output reg [3:0] pill_ten,
     output reg [3:0] pill_one,
